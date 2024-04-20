@@ -1,12 +1,42 @@
-import "./App.css";
+import { createBrowserRouter } from "react-router-dom";
+import Layout from "./components/layout";
+import Home from "./pages/home";
+import CarDetail from "./pages/car";
+import Dashboard from "./pages/dashboard";
+import New from "./pages/dashboard/new";
+import Login from "./pages/login";
+import Register from "./pages/register";
 
-function App() {
-  return(
-    <div>
-      <h1 className="text-3xl text-red-700">WebCarros</h1>
-      
-    </div>
-  )
-}
+const router = createBrowserRouter([
+  {
+    element: <Layout />,
+    children: [
+      {
+        path: "/",
+        element: <Home />,
+      },
+      {
+        path: "/car/:id",
+        element: <CarDetail />,
+      },
+      {
+        path: "/dashboard",
+        element: <Dashboard />,
+      },
+      {
+        path: "/dashboard/new",
+        element: <New />,
+      },
+    ],
+  },
+  {
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/register",
+    element: <Register />,
+  },
+]);
 
-export default App;
+export { router };
