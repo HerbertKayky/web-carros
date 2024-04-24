@@ -68,7 +68,7 @@ const Login = () => {
           </button>
         </form>
         <div>
-          <span className="">
+          <span>
             Ainda não possui uma conta? <Link className="font-medium" to="/register">
               Clique aqui </Link>para se cadastrar
           </span>
