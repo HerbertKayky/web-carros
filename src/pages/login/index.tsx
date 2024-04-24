@@ -33,18 +33,18 @@ const Login = () => {
   return (
     <Container>
       <div className="w-full min-h-screen flex justify-center items-center flex-col gap-4">
-        <Link className="mb-6 max-w-sm w-full" to="/">
+        <Link className="mb-6 max-w-xs w-full" to="/">
           <img className="w-full" src={logoImg} alt="Logo do site" />
         </Link>
 
         <form
-          className="bg-white max-w-xl w-full rounded-lg"
+          className="bg-white max-w-xl w-full rounded-lg p-4 "
           onSubmit={handleSubmit(onSubmit)}
         >
           <div className="mb-3">
             <Input
               type="email"
-              placeholder="digite seu email"
+              placeholder="Digite seu email"
               name="email"
               error={errors.email?.message}
               register={register}
@@ -53,15 +53,26 @@ const Login = () => {
           <div className="mb-3">
             <Input
               type="password"
-              placeholder="digite sua senha"
+              placeholder="Digite sua senha"
               name="password"
               error={errors.password?.message}
               register={register}
             />
           </div>
 
-          <button>Acessar</button>
+          <button
+            type="submit"
+            className="h-10 font-medium text-white bg-zinc-900 w-full rounded-md hover:bg-zinc-700 transition-all"
+          >
+            Acessar
+          </button>
         </form>
+        <div>
+          <span className="">
+            Ainda não possui uma conta? <Link className="font-medium" to="/register">
+              Clique aqui </Link>para se cadastrar
+          </span>
+        </div>
       </div>
     </Container>
   );
