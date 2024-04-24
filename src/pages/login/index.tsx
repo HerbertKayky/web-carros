@@ -5,6 +5,7 @@ import Input from "../../components/input";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import toast from "react-hot-toast";
 
 const schema = z.object({
   email: z
@@ -27,6 +28,14 @@ const Login = () => {
   });
 
   function onSubmit(data: FormData) {
+    toast.success("Login efetuado", 
+      {
+        style: {
+          background: "#333",
+          color: "#fff"
+        }
+      }
+    )
     console.log(data);
   }
 

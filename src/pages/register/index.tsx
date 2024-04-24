@@ -5,6 +5,7 @@ import Input from "../../components/input";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import toast from "react-hot-toast";
 
 const schema = z.object({
   name: z.string().min(1,"O campo nome é obrigatório"),
@@ -25,6 +26,14 @@ const Register = () => {
   });
 
   function onSubmit(data: FormData) {
+    toast.success("Cadastro efetuado", 
+      {
+        style: {
+          background: "#333",
+          color: "#fff"
+        }
+      }
+    )
     console.log(data);
   }
 
