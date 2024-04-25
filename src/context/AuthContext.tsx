@@ -24,11 +24,11 @@ function AuthProvider({ children }: AuthProviderProps) {
   const [loadingAuth, setLoadingAuth] = useState(true);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, () => {
+    const unsub = onAuthStateChanged(auth, (user) => {
       if (user) {
         setUser({
           uid: user.uid,
-          name: user?.name,
+          name: user?.displayName,
           email: user?.email,
         });
         setLoadingAuth(false);
