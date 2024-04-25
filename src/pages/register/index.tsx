@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logoImg from "../../assets/logo.svg";
 import Container from "../../components/container";
 import Input from "../../components/input";
@@ -6,6 +6,9 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { auth } from "../../services/firebaseConnection";
+
 
 const schema = z.object({
   name: z.string().min(1,"O campo nome é obrigatório"),
@@ -16,6 +19,7 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 const Register = () => {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -25,7 +29,7 @@ const Register = () => {
     mode: "onChange",
   });
 
-  function onSubmit(data: FormData) {
+  async function onSubmit(data: FormData) {
     toast.success("Cadastro efetuado", 
       {
         style: {
@@ -34,7 +38,24 @@ const Register = () => {
         }
       }
     )
-    console.log(data);
+    createUserWithEmailAndPassword(auth, data.email, data.password)
+    .then(async (user) => {
+      await updateProfile(user.user, {
+        displayName: data.name
+      })
+      navigate("/dashboard", { replace: true })
+    })
+    .catch(() => {
+      toast.error("Erro ao cadastrar", 
+      {
+        style: {
+          background: "#333",
+          color: "#fff"
+        }
+      }
+    )
+    })
+    ;
   }
 
   return (
@@ -80,7 +101,7 @@ const Register = () => {
             type="submit"
             className="h-10 font-medium text-white bg-zinc-900 w-full rounded-md hover:bg-zinc-700 transition-all"
           >
-            Acessar
+            Cadastrar
           </button>
         </form>
         <div>
