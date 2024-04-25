@@ -1,8 +1,12 @@
+import Container from "../../components/container";
+import DashboardHeader from "../../components/painelHeader";
 
 const Dashboard = () => {
-    return (
-      <div>Dashboard</div>
-    )
-  }
-  
-  export default Dashboard
+  return (
+    <Container>
+      <DashboardHeader />
+    </Container>
+  );
+};
+
+export default Dashboard;
