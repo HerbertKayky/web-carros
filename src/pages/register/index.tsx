@@ -6,14 +6,24 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  signOut,
+  updateProfile,
+} from "firebase/auth";
 import { auth } from "../../services/firebaseConnection";
-
+import { useEffect } from "react";
 
 const schema = z.object({
-  name: z.string().min(1,"O campo nome é obrigatório"),
-  email: z.string().email("Insira um email válido").min(1, "O campo email é obrigatório"),
-  password: z.string().min(1, "O campo senha é obrigatório").min(6, "A senha deve ter no mínimo 6 caracteres"),
+  name: z.string().min(1, "O campo nome é obrigatório"),
+  email: z
+    .string()
+    .email("Insira um email válido")
+    .min(1, "O campo email é obrigatório"),
+  password: z
+    .string()
+    .min(1, "O campo senha é obrigatório")
+    .min(6, "A senha deve ter no mínimo 6 caracteres"),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -29,33 +39,35 @@ const Register = () => {
     mode: "onChange",
   });
 
+  useEffect(() => {
+    async function handleLogout() {
+      await signOut(auth);
+    }
+    handleLogout();
+  }, []);
+
   async function onSubmit(data: FormData) {
-    toast.success("Cadastro efetuado", 
-      {
-        style: {
-          background: "#333",
-          color: "#fff"
-        }
-      }
-    )
     createUserWithEmailAndPassword(auth, data.email, data.password)
-    .then(async (user) => {
-      await updateProfile(user.user, {
-        displayName: data.name
+      .then(async (user) => {
+        await updateProfile(user.user, {
+          displayName: data.name,
+        });
+        toast.success("Cadastro efetuado", {
+          style: {
+            background: "#333",
+            color: "#fff",
+          },
+        });
+        navigate("/dashboard", { replace: true });
       })
-      navigate("/dashboard", { replace: true })
-    })
-    .catch(() => {
-      toast.error("Erro ao cadastrar", 
-      {
-        style: {
-          background: "#333",
-          color: "#fff"
-        }
-      }
-    )
-    })
-    ;
+      .catch(() => {
+        toast.error("Erro ao cadastrar", {
+          style: {
+            background: "#333",
+            color: "#fff",
+          },
+        });
+      });
   }
 
   return (
@@ -106,7 +118,11 @@ const Register = () => {
         </form>
         <div>
           <span>
-            Já possui uma conta? <Link className="font-medium" to="/login">Clique aqui </Link>para fazer o login
+            Já possui uma conta?{" "}
+            <Link className="font-medium" to="/login">
+              Clique aqui{" "}
+            </Link>
+            para fazer o login
           </span>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logoImg from "../../assets/logo.svg";
 import Container from "../../components/container";
 import Input from "../../components/input";
@@ -6,6 +6,9 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
+import { signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { auth } from "../../services/firebaseConnection";
+import { useEffect } from "react";
 
 const schema = z.object({
   email: z
@@ -18,6 +21,7 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 const Login = () => {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -27,16 +31,34 @@ const Login = () => {
     mode: "onChange",
   });
 
+  useEffect(() => {
+    async function handleLogout() {
+      await signOut(auth);
+    }
+    handleLogout();
+  }, []);
+
   function onSubmit(data: FormData) {
-    toast.success("Login efetuado", 
-      {
-        style: {
-          background: "#333",
-          color: "#fff"
-        }
-      }
-    )
-    console.log(data);
+    signInWithEmailAndPassword(auth, data.email, data.password)
+      .then((user) => {
+        toast.success("Login efetuado", {
+          style: {
+            background: "#333",
+            color: "#fff",
+          },
+        });
+        console.log(user);
+        navigate("/dashboard", { replace: true });
+      })
+      .catch(() => {
+        toast.error("Erro ao logar", {
+          style: {
+            background: "#333",
+            color: "#fff",
+          },
+        });
+        console.log("erro ao logar");
+      });
   }
 
   return (
@@ -78,8 +100,11 @@ const Login = () => {
         </form>
         <div>
           <span>
-            Ainda não possui uma conta? <Link className="font-medium" to="/register">
-              Clique aqui </Link>para se cadastrar
+            Ainda não possui uma conta?{" "}
+            <Link className="font-medium" to="/register">
+              Clique aqui{" "}
+            </Link>
+            para se cadastrar
           </span>
         </div>
       </div>
