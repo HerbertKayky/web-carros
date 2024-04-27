@@ -5,6 +5,16 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Input from "../../../components/input";
+import { ChangeEvent, useContext } from "react";
+import { AuthContext } from "../../../context/AuthContext";
+import { v4 as uuidV4 } from "uuid";
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject,
+} from "firebase/storage";
+import { storage } from "../../../services/firebaseConnection";
 
 const schema = z.object({
   name: z.string().min(1, "O campo nome é obrigatório"),
@@ -25,6 +35,7 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 const New = () => {
+  const { user } = useContext(AuthContext);
   const {
     register,
     handleSubmit,
@@ -34,6 +45,35 @@ const New = () => {
     resolver: zodResolver(schema),
     mode: "onChange",
   });
+
+  async function handleFile(e: ChangeEvent<HTMLInputElement>) {
+    if (e.target.files && e.target.files[0]) {
+      const image = e.target.files[0];
+      if (image.type === "image/jpeg" || image.type === "image/png") {
+        await handleUpload(image);
+      } else {
+        alert("Envie uma imagem .jpeg ou .png");
+        return;
+      }
+    }
+  }
+
+  async function handleUpload(image: File) {
+    if (!user?.uid) {
+      return;
+    }
+
+    const currentUid = user?.uid;
+    const uidImage = uuidV4();
+
+    const uploadRef = ref(storage, `images/${currentUid}/${uidImage}`);
+
+    uploadBytes(uploadRef, image).then((snapshot) => {
+      getDownloadURL(snapshot.ref).then((downloadUrl) => {
+        console.log(downloadUrl);
+      });
+    });
+  }
 
   function onSubmit(data: FormData) {
     console.log(data);
@@ -53,6 +93,7 @@ const New = () => {
               className="opacity-0 cursor-pointer"
               type="file"
               accept="image/*"
+              onChange={handleFile}
             />
           </div>
         </button>
