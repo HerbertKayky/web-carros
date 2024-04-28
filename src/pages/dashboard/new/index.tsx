@@ -14,7 +14,9 @@ import {
   getDownloadURL,
   deleteObject,
 } from "firebase/storage";
-import { storage } from "../../../services/firebaseConnection";
+import { db, storage } from "../../../services/firebaseConnection";
+import { addDoc, collection } from "firebase/firestore";
+import toast from "react-hot-toast";
 
 const schema = z.object({
   name: z.string().min(1, "O campo nome é obrigatório"),
@@ -92,7 +94,47 @@ const New = () => {
   }
 
   function onSubmit(data: FormData) {
-    console.log(data);
+    if (carImages.length === 0) {
+      alert("Envia alguma imagem deste carro");
+      return;
+    }
+
+    const carListImages = carImages.map((car) => {
+      return {
+        uid: car.uid,
+        name: car.name,
+        url: car.url,
+      };
+    });
+
+    addDoc(collection(db, "cars"), {
+      name: data.name,
+      model: data.model,
+      whatsapp: data.whatsapp,
+      city: data.city,
+      year: data.year,
+      km: data.km,
+      price: data.price,
+      description: data.description,
+      created: new Date(),
+      owner: user?.name,
+      uid: user?.uid,
+      images: carListImages,
+    })
+      .then(() => {
+        toast.success("Carro cadastrado!", {
+          style: {
+            background: "#333",
+            color: "#fff",
+          },
+        });
+        reset();
+        setCarImages([]);
+      })
+      .catch((error) => {
+        console.log(error);
+        console.log("erro ao cadastrar no banco");
+      });
   }
 
   async function handleDeleteImage(item: ImageItemProps) {
