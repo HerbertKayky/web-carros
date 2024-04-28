@@ -1,11 +1,11 @@
-import { FiUpload } from "react-icons/fi";
+import { FiTrash, FiUpload } from "react-icons/fi";
 import Container from "../../../components/container";
 import DashboardHeader from "../../../components/painelHeader";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Input from "../../../components/input";
-import { ChangeEvent, useContext } from "react";
+import { ChangeEvent, useContext, useState } from "react";
 import { AuthContext } from "../../../context/AuthContext";
 import { v4 as uuidV4 } from "uuid";
 import {
@@ -34,6 +34,13 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
+interface ImageItemProps {
+  uid: string;
+  name: string;
+  previewUrl: string;
+  url: string;
+}
+
 const New = () => {
   const { user } = useContext(AuthContext);
   const {
@@ -45,6 +52,8 @@ const New = () => {
     resolver: zodResolver(schema),
     mode: "onChange",
   });
+
+  const [carImages, setCarImages] = useState<ImageItemProps[]>([]);
 
   async function handleFile(e: ChangeEvent<HTMLInputElement>) {
     if (e.target.files && e.target.files[0]) {
@@ -70,13 +79,32 @@ const New = () => {
 
     uploadBytes(uploadRef, image).then((snapshot) => {
       getDownloadURL(snapshot.ref).then((downloadUrl) => {
-        console.log(downloadUrl);
+        const imageItem = {
+          name: uidImage,
+          uid: currentUid,
+          previewUrl: URL.createObjectURL(image),
+          url: downloadUrl,
+        };
+
+        setCarImages((images) => [...images, imageItem]);
       });
     });
   }
 
   function onSubmit(data: FormData) {
     console.log(data);
+  }
+
+  async function handleDeleteImage(item: ImageItemProps) {
+    const imagePath = `images/${item.uid}/${item.name}`;
+    const imageRef = ref(storage, imagePath);
+
+    try {
+      await deleteObject(imageRef);
+      setCarImages(carImages.filter((car) => car.url !== item.url));
+    } catch (err) {
+      console.log("Erro ao deletar");
+    }
   }
 
   return (
@@ -97,6 +125,25 @@ const New = () => {
             />
           </div>
         </button>
+
+        {carImages.map((item) => (
+          <div
+            className="w-full h-32 flex items-center justify-center relative"
+            key={item.name}
+          >
+            <button
+              className="absolute"
+              onClick={() => handleDeleteImage(item)}
+            >
+              <FiTrash size={28} color="#FFF" />
+            </button>
+            <img
+              className="w-full h-32 rounded-lg object-cover"
+              src={item.previewUrl}
+              alt="Foto do carro"
+            />
+          </div>
+        ))}
       </div>
       <div className="w-full bg-white p-3 rounded-lg flex flex-col sm:flex-row items-center gap-2 mt-2">
         <form className="w-full" onSubmit={handleSubmit(onSubmit)}>
