@@ -103,7 +103,7 @@ const CarDetail = () => {
         <main className="w-full bg-white rounded-lg p-6 my-4">
           <div className="flex flex-col sm:flex-row mb-4 items-center justify-between">
             <h1 className="font-bold text-3xl text-black">{car?.name}</h1>
-            <h1 className="font-bold text-3xl text-black">{car?.price}</h1>
+            <h1 className="font-bold text-3xl text-black">R$ {car?.price}</h1>
           </div>
           <p>{car?.model}</p>
 
@@ -132,7 +132,11 @@ const CarDetail = () => {
           <strong>Telefone / WhatsApp</strong>
           <p>{car?.whatsapp}</p>
 
-          <a className="bg-green-500 w-full flex text-white items-center justify-center gap-2 my-6 h-11 text-xl rounded-lg font-medium">
+          <a
+            href={`https://api.whatsapp.com/send?phone=${car?.whatsapp}&text=Olá vi esse ${car?.name} no site WebCarros e fiquei interessado`}
+            target="_blank"
+            className="bg-green-500 w-full flex text-white items-center justify-center gap-2 my-6 h-11 text-xl rounded-lg font-medium"
+          >
             Conversar com vendedor
             <FaWhatsapp size={26} color="#fff" />
           </a>

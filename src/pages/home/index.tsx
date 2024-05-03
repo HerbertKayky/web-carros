@@ -99,7 +99,7 @@ const Home = () => {
                   {car.year} | {car.km}
                 </span>
                 <strong className="text-black font-medium text-xl">
-                  {car.price}
+                  R$ {car.price}
                 </strong>
               </div>
 
