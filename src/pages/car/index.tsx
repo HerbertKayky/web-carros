@@ -1,6 +1,6 @@
 import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { db } from "../../services/firebaseConnection";
 import Container from "../../components/container";
 import { FaWhatsapp } from "react-icons/fa";
@@ -32,6 +32,7 @@ const CarDetail = () => {
   const { id } = useParams();
   const [car, setCar] = useState<CarProps>();
   const [sliderPerView, setSliderPerView] = useState<number>(2);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function loadCar() {
@@ -41,6 +42,10 @@ const CarDetail = () => {
 
       const docRef = doc(db, "cars", id);
       getDoc(docRef).then((snapshot) => {
+        if (!snapshot.data()) {
+          navigate("/");
+        }
+
         setCar({
           id: snapshot.id,
           name: snapshot.data()?.name,
@@ -80,17 +85,19 @@ const CarDetail = () => {
 
   return (
     <Container>
-      <Swiper
-        slidesPerView={sliderPerView}
-        pagination={{ clickable: true }}
-        navigation
-      >
-        {car?.images.map((image) => (
-          <SwiperSlide key={image.name}>
-            <img src={image.url} className="w-full h-96 object-cover" />
-          </SwiperSlide>
-        ))}
-      </Swiper>
+      {car && (
+        <Swiper
+          slidesPerView={sliderPerView}
+          pagination={{ clickable: true }}
+          navigation
+        >
+          {car?.images.map((image) => (
+            <SwiperSlide key={image.name}>
+              <img src={image.url} className="w-full h-96 object-cover" />
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      )}
 
       {car && (
         <main className="w-full bg-white rounded-lg p-6 my-4">
