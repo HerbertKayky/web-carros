@@ -108,7 +108,7 @@ const New = () => {
     });
 
     addDoc(collection(db, "cars"), {
-      name: data.name,
+      name: data.name.toUpperCase(),
       model: data.model,
       whatsapp: data.whatsapp,
       city: data.city,
